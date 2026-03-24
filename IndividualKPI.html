@@ -3,24 +3,93 @@
      Edit only this file for Page 1 changes
 ══════════════════════════════════════ -->
 <style>
-/* Page 1 specific styles */
+/* ── PAGE 1 TABLE STYLES ── */
 #page-1 .page-header{background:linear-gradient(120deg,#0a2342 0%,#0e4d6e 55%,#0a7c8c 100%);}
-#page-1 .table-card{border:1.5px solid #0e4d6e;border-top:none;border-radius:0 0 12px 12px;background:#fff;overflow:hidden;box-shadow:0 4px 14px rgba(10,35,66,0.1);}
-#page-1 table{width:100%;border-collapse:collapse;table-layout:auto;}
+
+/* overflow-x scroll so table never overflows on small screens */
+#page-1 .table-card{
+  border:1.5px solid #0e4d6e;border-top:none;
+  border-radius:0 0 12px 12px;background:#fff;
+  overflow-x:auto;
+  box-shadow:0 4px 14px rgba(10,35,66,0.1);
+}
+
+/* Full width, fixed layout so columns are controlled by colgroup */
+#page-1 table{
+  width:100%;
+  min-width:600px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+/* ── HEADER ROW 1 (group labels) ── */
 #page-1 thead tr:first-child{background:linear-gradient(90deg,#0a2342,#0e4d6e);}
-#page-1 thead tr:first-child th{color:#fff;font-size:9px;font-weight:700;padding:7px 4px;text-align:center;letter-spacing:0.4px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.12);}
+#page-1 thead tr:first-child th{
+  color:#fff;font-size:10px;font-weight:700;
+  padding:9px 6px;text-align:center;
+  letter-spacing:0.4px;text-transform:uppercase;
+  border-right:1px solid rgba(255,255,255,0.12);
+  vertical-align:middle;
+  white-space:nowrap;
+}
+/* RM Name header left-aligned */
+#page-1 thead tr:first-child th:nth-child(2){text-align:left;padding-left:12px;}
+
+/* ── HEADER ROW 2 (sub-labels: Old / New / W/MOU / W/O MOU) ── */
 #page-1 thead tr:last-child{background:#0a5570;}
-#page-1 thead tr:last-child th{color:#e0f7fa;font-size:8px;font-weight:600;padding:4px;text-align:center;border:1px solid rgba(255,255,255,0.1);}
-#page-1 tbody tr{border-bottom:1px solid #e8f4f8;transition:background 0.12s,transform 0.12s;}
+#page-1 thead tr:last-child th{
+  color:#e0f7fa;font-size:9px;font-weight:600;
+  padding:5px 6px;text-align:center;
+  border-right:1px solid rgba(255,255,255,0.1);
+  white-space:nowrap;
+}
+
+/* ── BODY ROWS ── */
+#page-1 tbody tr{border-bottom:1px solid #e8f4f8;transition:background 0.12s;}
 #page-1 tbody tr:nth-child(even){background:#f4fbfd;}
 #page-1 tbody tr:hover{background:#d6f0f5!important;}
-#page-1 tbody td{font-size:9px;padding:5px 4px;text-align:center;color:#1a2e3b;}
-#page-1 tbody td:nth-child(2){text-align:left;font-weight:600;color:#0a2342;padding-left:8px;}
-#page-1 .row-team{background:linear-gradient(90deg,#0e4d6e,#0a7c8c)!important;border-bottom:none!important;cursor:pointer;transition:filter 0.15s!important;}
+
+/* All data cells — center by default */
+#page-1 tbody td{
+  font-size:10px;padding:7px 6px;
+  text-align:center;color:#1a2e3b;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+/* Sr. No. */
+#page-1 tbody td:nth-child(1){color:#6b7280;font-size:9px;}
+/* RM Name — left aligned */
+#page-1 tbody td:nth-child(2){text-align:left;font-weight:600;color:#0a2342;padding-left:12px;}
+
+/* ── TEAM HEADER ROW ── */
+#page-1 .row-team{
+  background:linear-gradient(90deg,#0e4d6e,#0a7c8c)!important;
+  border-bottom:none!important;cursor:pointer;
+  transition:filter 0.15s!important;
+}
 #page-1 .row-team:hover{filter:brightness(1.12)!important;}
-#page-1 .row-team td{font-size:10px;font-weight:700;color:#fff!important;text-transform:uppercase;letter-spacing:1.2px;padding:7px 4px;text-align:center!important;}
-#page-1 .row-total td{background:#e6f7fa;font-weight:700;font-size:9px;color:#0a2342;border-top:2px solid #0a7c8c;text-align:center;padding:4px;}
-#page-1 .row-grand td{background:linear-gradient(90deg,#0a2342,#0e4d6e);color:#fff!important;font-weight:700;font-size:9px;text-align:center;padding:5px 4px;}
+#page-1 .row-team td{
+  font-size:11px;font-weight:700;color:#fff!important;
+  text-transform:uppercase;letter-spacing:1.4px;
+  padding:9px 6px;text-align:center!important;
+}
+
+/* ── TEAM TOTAL ROW ── */
+#page-1 .row-total td{
+  background:#e6f7fa;font-weight:700;font-size:10px;
+  color:#0a2342;border-top:2px solid #0a7c8c;
+  text-align:center;padding:6px;
+}
+#page-1 .row-total td:nth-child(2){text-align:left;padding-left:12px;}
+
+/* ── GRAND TOTAL ROW ── */
+#page-1 .row-grand td{
+  background:linear-gradient(90deg,#0a2342,#0e4d6e);
+  color:#fff!important;font-weight:700;font-size:10px;
+  text-align:center;padding:8px 6px;
+}
+#page-1 .row-grand td:nth-child(2){text-align:left;padding-left:12px;}
+
 #page-1 .data-row{cursor:pointer;}
 </style>
 
@@ -164,39 +233,88 @@ function applyFilters(){
 }
 
 function renderIndividual(data){
-  document.getElementById("dateRangeLabel").innerText=fmtDateLabel(document.getElementById("startDate").value,document.getElementById("endDate").value);
-  var html="<table style='table-layout:auto;width:auto;'>";
-  html+="<thead><tr>";
-  html+="<th style='white-space:nowrap;'>#</th>";
-  html+="<th style='white-space:nowrap;text-align:left;'>RM Name</th>";
-  html+="<th style='white-space:nowrap;'>Deposit</th>";
-  html+="<th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.25);white-space:nowrap;'>Applications</th>";
-  html+="<th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.25);white-space:nowrap;'>Onboarding</th>";
-  html+="<th style='white-space:nowrap;'>Status</th>";
-  html+="</tr><tr>";
-  html+="<th></th><th></th><th></th>";
-  html+="<th style='white-space:nowrap;'>Old</th><th style='white-space:nowrap;'>New</th>";
-  html+="<th style='white-space:nowrap;'>W/MOU</th><th style='white-space:nowrap;'>W/O MOU</th>";
-  html+="<th></th></tr></thead><tbody>";
+  document.getElementById("dateRangeLabel").innerText=fmtDateLabel(
+    document.getElementById("startDate").value,
+    document.getElementById("endDate").value
+  );
+
+  // colgroup gives each column a fixed width so alignment is consistent
+  var html="<table>"
+    +"<colgroup>"
+    +"<col style='width:42px'>"   /* # */
+    +"<col style='width:160px'>"  /* RM Name */
+    +"<col style='width:72px'>"   /* Deposit */
+    +"<col style='width:60px'>"   /* Old App */
+    +"<col style='width:60px'>"   /* New App */
+    +"<col style='width:70px'>"   /* With MOU */
+    +"<col style='width:78px'>"   /* Without MOU */
+    +"<col style='width:80px'>"   /* Status */
+    +"</colgroup>";
+
+  /* Header row 1 — group labels */
+  html+="<thead>"
+    +"<tr>"
+    +"<th rowspan='2'>#</th>"
+    +"<th rowspan='2' style='text-align:left;padding-left:12px;'>RM Name</th>"
+    +"<th rowspan='2'>Deposit</th>"
+    +"<th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.3);'>Applications</th>"
+    +"<th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.3);'>Onboarding</th>"
+    +"<th rowspan='2'>Status</th>"
+    +"</tr>";
+
+  /* Header row 2 — sub-labels */
+  html+="<tr>"
+    +"<th>Old</th>"
+    +"<th>New</th>"
+    +"<th>W/MOU</th>"
+    +"<th>W/O MOU</th>"
+    +"</tr>"
+    +"</thead><tbody>";
 
   data.teams.forEach(function(team){
-    html+="<tr class='row-team' onclick='showTeamCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(team))+"\"))'>";
-    html+="<td colspan='8' style='color:#fff!important;font-weight:700;text-align:center;letter-spacing:1px;'>"+team.teamName+"</td></tr>";
+    /* Team header row */
+    html+="<tr class='row-team' onclick='showTeamCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(team))+"\"))'>"
+      +"<td colspan='8'>"+team.teamName+"</td></tr>";
+
+    /* Member rows */
     team.members.forEach(function(m){
-      html+="<tr class='data-row' onclick='showRMCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(m))+"\"))'>";
-      html+="<td style='white-space:nowrap;'>"+m.sr+"</td>";
-      html+="<td style='text-align:left;white-space:nowrap;'>"+m.name+"</td>";
-      html+="<td>"+fmtNum(m.deposit)+"</td>";
-      html+="<td>"+fmtNum(m.oldApp)+"</td>";
-      html+="<td>"+fmtNum(m.newApp)+"</td>";
-      html+="<td>"+fmtNum(m.withMOU)+"</td>";
-      html+="<td>"+fmtNum(m.withoutMOU)+"</td>";
-      html+="<td>"+statusBadge(m.status)+"</td></tr>";
+      html+="<tr class='data-row' onclick='showRMCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(m))+"\"))'>"
+        +"<td>"+m.sr+"</td>"
+        +"<td>"+m.name+"</td>"
+        +"<td>"+fmtNum(m.deposit)+"</td>"
+        +"<td>"+fmtNum(m.oldApp)+"</td>"
+        +"<td>"+fmtNum(m.newApp)+"</td>"
+        +"<td>"+fmtNum(m.withMOU)+"</td>"
+        +"<td>"+fmtNum(m.withoutMOU)+"</td>"
+        +"<td>"+statusBadge(m.status)+"</td>"
+        +"</tr>";
     });
-    html+="<tr class='row-total'><td></td><td style='text-align:left;padding-left:8px;white-space:nowrap;'>Team Total</td><td>"+team.totals.deposit+"</td><td>"+team.totals.oldApp+"</td><td>"+team.totals.newApp+"</td><td>"+team.totals.withMOU+"</td><td>"+team.totals.withoutMOU+"</td><td></td></tr>";
+
+    /* Team total row */
+    html+="<tr class='row-total'>"
+      +"<td></td>"
+      +"<td>Team Total</td>"
+      +"<td>"+team.totals.deposit+"</td>"
+      +"<td>"+team.totals.oldApp+"</td>"
+      +"<td>"+team.totals.newApp+"</td>"
+      +"<td>"+team.totals.withMOU+"</td>"
+      +"<td>"+team.totals.withoutMOU+"</td>"
+      +"<td></td></tr>";
   });
+
+  /* Grand total row */
   var g=data.grandTotal;
-  html+="<tr class='row-grand'><td></td><td style='text-align:left;padding-left:8px;white-space:nowrap;'>Grand Total</td><td>"+g.deposit+"</td><td>"+g.oldApp+"</td><td>"+g.newApp+"</td><td>"+g.withMOU+"</td><td>"+g.withoutMOU+"</td><td></td></tr></tbody></table>";
+  html+="<tr class='row-grand'>"
+    +"<td></td>"
+    +"<td>Grand Total</td>"
+    +"<td>"+g.deposit+"</td>"
+    +"<td>"+g.oldApp+"</td>"
+    +"<td>"+g.newApp+"</td>"
+    +"<td>"+g.withMOU+"</td>"
+    +"<td>"+g.withoutMOU+"</td>"
+    +"<td></td></tr>"
+    +"</tbody></table>";
+
   document.getElementById("tableContainer").innerHTML=html;
 }
 
