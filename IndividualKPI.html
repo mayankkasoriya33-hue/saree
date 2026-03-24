@@ -1,0 +1,371 @@
+<!-- ══════════════════════════════════════
+     PAGE 1 — Individual KPI
+     Edit only this file for Page 1 changes
+══════════════════════════════════════ -->
+<style>
+/* ── PAGE 1 TABLE STYLES ── */
+#page-1 .page-header{background:linear-gradient(120deg,#0a2342 0%,#0e4d6e 55%,#0a7c8c 100%);}
+
+/* overflow-x scroll so table never overflows on small screens */
+#page-1 .table-card{
+  border:1.5px solid #0e4d6e;border-top:none;
+  border-radius:0 0 12px 12px;background:#fff;
+  overflow-x:auto;
+  box-shadow:0 4px 14px rgba(10,35,66,0.1);
+}
+
+/* Full width, fixed layout so columns are controlled by colgroup */
+#page-1 table{
+  width:100%;
+  min-width:600px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+/* ── HEADER ROW 1 (group labels) ── */
+#page-1 thead tr:first-child{background:linear-gradient(90deg,#0a2342,#0e4d6e);}
+#page-1 thead tr:first-child th{
+  color:#fff;font-size:10px;font-weight:700;
+  padding:9px 6px;text-align:center;
+  letter-spacing:0.4px;text-transform:uppercase;
+  border-right:1px solid rgba(255,255,255,0.12);
+  vertical-align:middle;
+  white-space:nowrap;
+}
+/* RM Name header left-aligned */
+#page-1 thead tr:first-child th:nth-child(2){text-align:left;padding-left:12px;}
+
+/* ── HEADER ROW 2 (sub-labels: Old / New / W/MOU / W/O MOU) ── */
+#page-1 thead tr:last-child{background:#0a5570;}
+#page-1 thead tr:last-child th{
+  color:#e0f7fa;font-size:9px;font-weight:600;
+  padding:5px 6px;text-align:center;
+  border-right:1px solid rgba(255,255,255,0.1);
+  white-space:nowrap;
+}
+
+/* ── BODY ROWS ── */
+#page-1 tbody tr{border-bottom:1px solid #e8f4f8;transition:background 0.12s;}
+#page-1 tbody tr:nth-child(even){background:#f4fbfd;}
+#page-1 tbody tr:hover{background:#d6f0f5!important;}
+
+/* All data cells — center by default */
+#page-1 tbody td{
+  font-size:10px;padding:7px 6px;
+  text-align:center;color:#1a2e3b;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+/* Sr. No. */
+#page-1 tbody td:nth-child(1){color:#6b7280;font-size:9px;}
+/* RM Name — left aligned */
+#page-1 tbody td:nth-child(2){text-align:left;font-weight:600;color:#0a2342;padding-left:12px;}
+
+/* ── TEAM HEADER ROW ── */
+#page-1 .row-team{
+  background:linear-gradient(90deg,#0e4d6e,#0a7c8c)!important;
+  border-bottom:none!important;cursor:pointer;
+  transition:filter 0.15s!important;
+}
+#page-1 .row-team:hover{filter:brightness(1.12)!important;}
+#page-1 .row-team td{
+  font-size:11px;font-weight:700;color:#fff!important;
+  text-transform:uppercase;letter-spacing:1.4px;
+  padding:9px 6px;text-align:center!important;
+}
+
+/* ── TEAM TOTAL ROW ── */
+#page-1 .row-total td{
+  background:#e6f7fa;font-weight:700;font-size:10px;
+  color:#0a2342;border-top:2px solid #0a7c8c;
+  text-align:center;padding:6px;
+}
+#page-1 .row-total td:nth-child(2){text-align:left;padding-left:12px;}
+
+/* ── GRAND TOTAL ROW ── */
+#page-1 .row-grand td{
+  background:linear-gradient(90deg,#0a2342,#0e4d6e);
+  color:#fff!important;font-weight:700;font-size:10px;
+  text-align:center;padding:8px 6px;
+}
+#page-1 .row-grand td:nth-child(2){text-align:left;padding-left:12px;}
+
+#page-1 .data-row{cursor:pointer;}
+</style>
+
+<div class="page" id="page-1">
+
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="control-group"><label>From</label><input type="date" id="startDate"></div>
+    <div class="control-group"><label>To</label><input type="date" id="endDate"></div>
+    <button class="btn-apply" onclick="loadData()">Apply</button>
+    <div class="controls-divider"></div>
+    <div class="control-group">
+      <label>Team</label>
+      <select class="filter-select" id="teamFilter" onchange="onTeamFilterChange()"><option value="">All Teams</option></select>
+    </div>
+    <div class="control-group">
+      <label>RM</label>
+      <select class="filter-select" id="rmFilter" onchange="applyFilters()"><option value="">All RMs</option></select>
+    </div>
+    <div class="controls-divider"></div>
+    <button class="btn-refresh" id="refreshBtn" onclick="refreshData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+    <div class="controls-divider"></div>
+    <div class="zoom-group">
+      <label>Zoom</label>
+      <input type="range" min="50" max="150" value="100" id="zoomRange" oninput="zoomTable()">
+      <span class="zoom-badge" id="zoomValue">100%</span>
+    </div>
+  </div>
+
+  <!-- Download FAB -->
+  <button class="dl-toggle-btn" id="dlToggleBtn" onclick="toggleExportPanel()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span class="dl-label">Download</span>
+  </button>
+  <div class="export-panel" id="exportPanel">
+    <div class="export-panel-header">
+      <span class="export-panel-title">Download</span>
+      <button class="export-panel-close" onclick="toggleExportPanel()">✕</button>
+    </div>
+    <div class="export-btns">
+      <button class="btn-exp btn-jpg" onclick="downloadJPG()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Export JPG</button>
+      <button class="btn-exp btn-xlsx" onclick="downloadExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Export Excel</button>
+      <button class="btn-exp btn-pdf" onclick="downloadPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Export PDF</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div id="zoomWrapper">
+    <div class="page-header">
+      <div class="header-title">
+        <p>Digi-Sales Individual KPI &nbsp;|&nbsp; <span id="dateRangeLabel">Loading...</span></p>
+      </div>
+    </div>
+    <div class="table-card" id="p1TableCard">
+      <div id="tableContainer">
+        <div class="loading-state">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Date select karo aur Apply dabao
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart view (hidden by default, switchable) -->
+  <div id="p1ChartView" style="display:none;margin-top:12px;">
+    <div style="background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.07);">
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="chart-tab active" onclick="switchChartType('bar',this)">📊 Bar</button>
+        <button class="chart-tab" onclick="switchChartType('line',this)">📈 Line</button>
+        <button class="chart-tab" onclick="switchChartType('pie',this)">🥧 Pie</button>
+        <button class="chart-tab" onclick="switchChartType('rm',this)">👤 RM</button>
+        <div style="margin-left:auto;">
+          <select id="yAxisSelect" onchange="buildChart(currentChartType)" style="border:1.5px solid #b2e8f0;border-radius:7px;padding:4px 7px;font-size:11px;font-family:'Inter',sans-serif;color:#0a2342;background:#f4fbfd;outline:none;">
+            <option value="all">All Metrics</option>
+            <option value="deposit">Deposit</option>
+            <option value="oldApp">Old App</option>
+            <option value="newApp">New App</option>
+            <option value="withMOU">With MOU</option>
+            <option value="withoutMOU">Without MOU</option>
+          </select>
+        </div>
+      </div>
+      <canvas id="chartCanvas" height="240"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════
+   PAGE 1 — Individual KPI Logic
+════════════════════════════════ */
+
+function populateFilters(data){
+  var teamRMmap={};
+  data.teams.forEach(function(t){teamRMmap[t.teamName]=t.members.map(function(m){return m.name;});});
+  window._p1TeamRMMap=teamRMmap;
+  var tf=document.getElementById("teamFilter"),rf=document.getElementById("rmFilter");
+  var st=tf.value,sr=rf.value;
+  tf.innerHTML='<option value="">All Teams</option>';
+  Object.keys(teamRMmap).forEach(function(t){tf.innerHTML+='<option value="'+t+'">'+t+'</option>';});
+  tf.value=st;
+  updateP1RMFilter(tf.value,teamRMmap);
+  if(rf.querySelector('option[value="'+sr+'"]'))rf.value=sr;
+}
+
+function updateP1RMFilter(selectedTeam,teamRMmap){
+  var map=teamRMmap||window._p1TeamRMMap||{};
+  var rf=document.getElementById("rmFilter");
+  rf.innerHTML='<option value="">All RMs</option>';
+  var rms=[];
+  if(selectedTeam&&map[selectedTeam]){rms=map[selectedTeam];}
+  else{var seen={};Object.values(map).forEach(function(arr){arr.forEach(function(r){if(!seen[r]){seen[r]=1;rms.push(r);}});});}
+  rms.sort().forEach(function(r){rf.innerHTML+='<option value="'+r+'">'+r+'</option>';});
+}
+
+function onTeamFilterChange(){
+  updateP1RMFilter(document.getElementById("teamFilter").value);
+  document.getElementById("rmFilter").value="";
+  applyFilters();
+}
+
+function applyFilters(){
+  if(!rawData)return;
+  var st=document.getElementById("teamFilter").value,sr=document.getElementById("rmFilter").value;
+  var fd={teams:[],grandTotal:{deposit:0,oldApp:0,newApp:0,withMOU:0,withoutMOU:0}};
+  rawData.teams.forEach(function(team){
+    if(st&&team.teamName!==st)return;
+    var members=team.members.filter(function(m){return!sr||m.name===sr;});
+    if(!members.length)return;
+    var t={deposit:0,oldApp:0,newApp:0,withMOU:0,withoutMOU:0};
+    members.forEach(function(m){t.deposit+=(parseInt(m.deposit)||0);t.oldApp+=(parseInt(m.oldApp)||0);t.newApp+=(parseInt(m.newApp)||0);t.withMOU+=(parseInt(m.withMOU)||0);t.withoutMOU+=(parseInt(m.withoutMOU)||0);});
+    fd.grandTotal.deposit+=t.deposit;fd.grandTotal.oldApp+=t.oldApp;fd.grandTotal.newApp+=t.newApp;fd.grandTotal.withMOU+=t.withMOU;fd.grandTotal.withoutMOU+=t.withoutMOU;
+    fd.teams.push({teamName:team.teamName,members:members,totals:t});
+  });
+  filteredData=fd;
+  renderIndividual(fd);
+}
+
+function renderIndividual(data){
+  document.getElementById("dateRangeLabel").innerText=fmtDateLabel(
+    document.getElementById("startDate").value,
+    document.getElementById("endDate").value
+  );
+
+  // colgroup gives each column a fixed width so alignment is consistent
+  var html="<table>"
+    +"<colgroup>"
+    +"<col style='width:42px'>"   /* # */
+    +"<col style='width:160px'>"  /* RM Name */
+    +"<col style='width:72px'>"   /* Deposit */
+    +"<col style='width:60px'>"   /* Old App */
+    +"<col style='width:60px'>"   /* New App */
+    +"<col style='width:70px'>"   /* With MOU */
+    +"<col style='width:78px'>"   /* Without MOU */
+    +"<col style='width:80px'>"   /* Status */
+    +"</colgroup>";
+
+  /* Header row 1 — group labels */
+  html+="<thead>"
+    +"<tr>"
+    +"<th rowspan='2'>#</th>"
+    +"<th rowspan='2' style='text-align:left;padding-left:12px;'>RM Name</th>"
+    +"<th rowspan='2'>Deposit</th>"
+    +"<th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.3);'>Applications</th>"
+    +"<th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.3);'>Onboarding</th>"
+    +"<th rowspan='2'>Status</th>"
+    +"</tr>";
+
+  /* Header row 2 — sub-labels */
+  html+="<tr>"
+    +"<th>Old</th>"
+    +"<th>New</th>"
+    +"<th>W/MOU</th>"
+    +"<th>W/O MOU</th>"
+    +"</tr>"
+    +"</thead><tbody>";
+
+  data.teams.forEach(function(team){
+    /* Team header row */
+    html+="<tr class='row-team' onclick='showTeamCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(team))+"\"))'>"
+      +"<td colspan='8'>"+team.teamName+"</td></tr>";
+
+    /* Member rows */
+    team.members.forEach(function(m){
+      html+="<tr class='data-row' onclick='showRMCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(m))+"\"))'>"
+        +"<td>"+m.sr+"</td>"
+        +"<td>"+m.name+"</td>"
+        +"<td>"+fmtNum(m.deposit)+"</td>"
+        +"<td>"+fmtNum(m.oldApp)+"</td>"
+        +"<td>"+fmtNum(m.newApp)+"</td>"
+        +"<td>"+fmtNum(m.withMOU)+"</td>"
+        +"<td>"+fmtNum(m.withoutMOU)+"</td>"
+        +"<td>"+statusBadge(m.status)+"</td>"
+        +"</tr>";
+    });
+
+    /* Team total row */
+    html+="<tr class='row-total'>"
+      +"<td></td>"
+      +"<td>Team Total</td>"
+      +"<td>"+team.totals.deposit+"</td>"
+      +"<td>"+team.totals.oldApp+"</td>"
+      +"<td>"+team.totals.newApp+"</td>"
+      +"<td>"+team.totals.withMOU+"</td>"
+      +"<td>"+team.totals.withoutMOU+"</td>"
+      +"<td></td></tr>";
+  });
+
+  /* Grand total row */
+  var g=data.grandTotal;
+  html+="<tr class='row-grand'>"
+    +"<td></td>"
+    +"<td>Grand Total</td>"
+    +"<td>"+g.deposit+"</td>"
+    +"<td>"+g.oldApp+"</td>"
+    +"<td>"+g.newApp+"</td>"
+    +"<td>"+g.withMOU+"</td>"
+    +"<td>"+g.withoutMOU+"</td>"
+    +"<td></td></tr>"
+    +"</tbody></table>";
+
+  document.getElementById("tableContainer").innerHTML=html;
+}
+
+function loadData(){
+  var s=document.getElementById("startDate").value,e=document.getElementById("endDate").value;
+  document.getElementById("dateRangeLabel").innerText=fmtDateLabel(s,e);
+  document.getElementById("tableContainer").innerHTML='<div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>';
+  google.script.run.withSuccessHandler(function(data){rawData=data;populateFilters(data);applyFilters();}).getData(s,e);
+}
+
+function refreshData(){
+  var btn=document.getElementById("refreshBtn");btn.classList.add("spinning");
+  var s=document.getElementById("startDate").value,e=document.getElementById("endDate").value;
+  google.script.run.withSuccessHandler(function(data){rawData=data;populateFilters(data);applyFilters();btn.classList.remove("spinning");}).getData(s,e);
+}
+
+/* Chart */
+function switchChartType(type,el){
+  currentChartType=type;
+  document.querySelectorAll("#p1ChartView .chart-tab").forEach(function(t){t.classList.remove("active");});
+  el.classList.add("active");
+  buildChart(type);
+}
+function buildChart(type){
+  var d=filteredData||rawData;if(!d)return;
+  var ctx=document.getElementById("chartCanvas").getContext("2d");
+  if(kpiChart)kpiChart.destroy();
+  var yAxis=document.getElementById("yAxisSelect").value;
+  var labels=[],dataMap={deposit:[],oldApp:[],newApp:[],withMOU:[],withoutMOU:[]};
+  if(type==="rm"){d.teams.forEach(function(team){team.members.forEach(function(m){labels.push(m.name);dataMap.deposit.push(m.deposit||0);dataMap.oldApp.push(m.oldApp||0);dataMap.newApp.push(m.newApp||0);dataMap.withMOU.push(m.withMOU||0);dataMap.withoutMOU.push(m.withoutMOU||0);});});}
+  else{d.teams.forEach(function(team){labels.push(team.teamName);dataMap.deposit.push(team.totals.deposit);dataMap.oldApp.push(team.totals.oldApp);dataMap.newApp.push(team.totals.newApp);dataMap.withMOU.push(team.totals.withMOU);dataMap.withoutMOU.push(team.totals.withoutMOU);});}
+  var allDS=[{key:"deposit",label:"Deposit",bg:"rgba(10,124,140,0.82)",bc:"#0a7c8c"},{key:"oldApp",label:"Old App",bg:"rgba(243,156,18,0.78)",bc:"#f39c12"},{key:"newApp",label:"New App",bg:"rgba(10,35,66,0.78)",bc:"#0a2342"},{key:"withMOU",label:"With MOU",bg:"rgba(39,174,96,0.78)",bc:"#27ae60"},{key:"withoutMOU",label:"Without MOU",bg:"rgba(231,76,60,0.78)",bc:"#e74c3c"}];
+  var datasets=allDS.filter(function(ds){return yAxis==="all"||yAxis===ds.key;}).map(function(ds){return{label:ds.label,data:dataMap[ds.key],backgroundColor:ds.bg,borderColor:ds.bc,borderWidth:1.5,tension:0.4,fill:false};});
+  if(type==="pie"){var pd=yAxis==="all"?dataMap.deposit:(dataMap[yAxis]||dataMap.deposit);kpiChart=new Chart(ctx,{type:"doughnut",data:{labels:labels,datasets:[{data:pd,backgroundColor:["#0a7c8c","#f39c12","#0a2342","#27ae60","#e74c3c","#9b59b6","#1abc9c"],borderColor:"#fff",borderWidth:3}]},options:{responsive:true,plugins:{legend:{position:"right",labels:{font:{size:11,family:"Inter"},color:"#0a2342"}}}}});return;}
+  kpiChart=new Chart(ctx,{type:type==="line"?"line":"bar",data:{labels:labels,datasets:datasets},options:{responsive:true,interaction:{mode:"index",intersect:false},plugins:{legend:{position:"top",labels:{font:{size:11,family:"Inter"},color:"#0a2342",padding:12}},tooltip:{backgroundColor:"#0a2342",titleFont:{size:11,family:"Inter"},bodyFont:{size:10,family:"Inter"},padding:9,cornerRadius:7}},scales:{x:{grid:{color:"rgba(0,0,0,0.04)"},ticks:{font:{size:10,family:"Inter"},color:"#0a2342",maxRotation:35}},y:{beginAtZero:true,grid:{color:"rgba(0,0,0,0.04)"},ticks:{font:{size:10,family:"Inter"},color:"#0a2342"}}}}});
+}
+
+/* Exports */
+function downloadJPG(){
+  var w=document.getElementById("zoomWrapper"),pt=w.style.transform;
+  w.style.transform="scale(1)";
+  setTimeout(function(){html2canvas(w,{scale:2,useCORS:true,backgroundColor:"#ffffff",width:w.offsetWidth,height:w.scrollHeight}).then(function(c){w.style.transform=pt;var a=document.createElement("a");a.download="KPI_Individual.jpg";a.href=c.toDataURL("image/jpeg",0.95);a.click();});},120);
+}
+function downloadExcel(){
+  if(!filteredData&&!rawData)return;var d=filteredData||rawData;
+  var ws=[["#","RM Name","Deposit","Old App","New App","With MOU","Without MOU","Status"]];
+  d.teams.forEach(function(t){ws.push([t.teamName,"","","","","","",""]);t.members.forEach(function(m){ws.push([m.sr,m.name,m.deposit,m.oldApp,m.newApp,m.withMOU,m.withoutMOU,m.status]);});ws.push(["","Total",t.totals.deposit,t.totals.oldApp,t.totals.newApp,t.totals.withMOU,t.totals.withoutMOU,""]);}); 
+  var g=d.grandTotal;ws.push(["","Grand Total",g.deposit,g.oldApp,g.newApp,g.withMOU,g.withoutMOU,""]);
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws),"Individual KPI");XLSX.writeFile(wb,"KPI_Individual.xlsx");
+}
+function downloadPDF(){
+  html2canvas(document.getElementById("zoomWrapper"),{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(function(c){var w=window.open('','_blank');w.document.write('<html><body style="margin:0"><img src="'+c.toDataURL("image/jpeg",0.95)+'" style="width:100%"></body></html>');w.document.close();setTimeout(function(){w.print();w.close();},500);});
+}
+</script>

@@ -1,0 +1,203 @@
+<!-- ══════════════════════════════════════
+     PAGE 2 — Team KPI (B2B) + AI Chat
+     Edit only this file for Page 2 changes
+══════════════════════════════════════ -->
+<style>
+.team-kpi-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.team-kpi-date{background:linear-gradient(120deg,#0f0c29,#302b63,#24243e);padding:12px 20px;text-align:center;}
+.team-kpi-date p{font-size:13px;color:#fff;font-weight:500;}
+#page-2 table{width:100%;border-collapse:collapse;}
+#page-2 tbody tr td{padding:13px 14px!important;font-size:13px!important;}
+#page-2 thead tr th{padding:12px 14px!important;font-size:12px!important;}
+
+/* AI Chatbox */
+.ai-chatbox{margin-top:16px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 3px 16px rgba(10,35,66,0.1);border:1.5px solid #e0f4f8;}
+.ai-chat-header{background:linear-gradient(120deg,#0a2342,#0e4d6e,#0a7c8c);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;}
+.ai-chat-title{display:flex;align-items:center;gap:8px;}
+.ai-chat-title span{font-size:13px;font-weight:700;color:#fff;}
+.ai-dot{width:9px;height:9px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80;animation:pulse-dot 1.5s ease-in-out infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(1.3);}}
+.ai-chat-messages{height:200px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f8fbff;}
+.ai-msg{display:flex;align-items:flex-start;gap:8px;}
+.ai-msg.ai-msg-user{flex-direction:row-reverse;}
+.ai-msg-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0a7c8c,#0e4d6e);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;}
+.ai-msg.ai-msg-user .ai-msg-avatar{background:linear-gradient(135deg,#f39c12,#e67e22);}
+.ai-msg-bubble{background:#fff;border:1px solid #e0f4f8;border-radius:10px 10px 10px 3px;padding:9px 12px;font-size:12px;color:#1a2e3b;max-width:80%;line-height:1.55;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.ai-msg.ai-msg-user .ai-msg-bubble{background:linear-gradient(135deg,#0e4d6e,#0a7c8c);color:#fff;border-color:transparent;border-radius:10px 10px 3px 10px;}
+.ai-msg-bubble.typing{color:#9ca3af;font-style:italic;}
+.ai-chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #e8f4f8;background:#fff;}
+.ai-chat-input-row input{flex:1;border:1.5px solid #e0f4f8;border-radius:9px;padding:9px 12px;font-size:12px;font-family:'Inter',sans-serif;color:#1a2e3b;background:#f8fbff;outline:none;transition:border-color 0.18s;}
+.ai-chat-input-row input:focus{border-color:#0a7c8c;background:#fff;}
+.ai-send-btn{background:linear-gradient(135deg,#0a7c8c,#0e4d6e);border:none;border-radius:9px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.12s,filter 0.12s;flex-shrink:0;}
+.ai-send-btn:hover{transform:scale(1.07);filter:brightness(1.1);}
+.ai-send-btn svg{width:16px;height:16px;color:#fff;}
+
+@media(max-width:768px){
+  #page-2 tbody tr td{padding:10px 10px!important;font-size:12px!important;}
+}
+@media(max-width:480px){
+  #page-2 tbody tr td{padding:8px!important;font-size:11px!important;}
+}
+</style>
+
+<div class="page" id="page-2">
+
+  <!-- Controls -->
+  <div class="controls-bar">
+    <button class="btn-refresh" id="refreshBtn2" onclick="loadTeamData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+    <div class="controls-divider"></div>
+    <input type="text" id="teamSearch" placeholder="🔍 Search team..." oninput="filterTeamTable()"
+      style="border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 10px;font-size:12px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;width:160px;transition:border-color 0.18s;"
+      onfocus="this.style.borderColor='#0a7c8c'" onblur="this.style.borderColor='#e5e7eb'">
+  </div>
+
+  <!-- Download FAB -->
+  <button class="dl-toggle-btn" id="dlToggleBtn2" onclick="toggleExportPanel2()" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span class="dl-label">Download</span>
+  </button>
+  <div class="export-panel" id="exportPanel2">
+    <div class="export-panel-header"><span class="export-panel-title">Download</span><button class="export-panel-close" onclick="toggleExportPanel2()">✕</button></div>
+    <div class="export-btns">
+      <button class="btn-exp btn-jpg" onclick="downloadJPG2()">Export JPG</button>
+      <button class="btn-exp btn-xlsx" onclick="downloadExcel2()">Export Excel</button>
+      <button class="btn-exp btn-pdf" onclick="downloadPDF2()">Export PDF</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div id="zoomWrapper2">
+    <div class="team-kpi-card">
+      <div class="team-kpi-date"><p>Team KPI (B2B) &nbsp;|&nbsp; <span id="teamDateLabel">Loading...</span></p></div>
+      <div id="teamContainer">
+        <div class="loading-state">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Loading...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Chatbox -->
+  <div class="ai-chatbox">
+    <div class="ai-chat-header">
+      <div class="ai-chat-title"><div class="ai-dot"></div><span>AI Team Analysis</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="clearAIChat()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Clear</button>
+        <span style="font-size:9px;color:rgba(255,255,255,0.45);">Gemini AI</span>
+      </div>
+    </div>
+    <div class="ai-chat-messages" id="aiMessages">
+      <div class="ai-msg ai-msg-bot">
+        <div class="ai-msg-avatar">AI</div>
+        <div class="ai-msg-bubble">Namaste! 👋 Data load hone ke baad koi bhi analysis poochho.</div>
+      </div>
+    </div>
+    <div class="ai-chat-input-row">
+      <input type="text" id="aiInput" placeholder="Analysis poochho..." onkeydown="if(event.key==='Enter') sendAIMessage()">
+      <button class="ai-send-btn" onclick="sendAIMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════
+   PAGE 2 — Team KPI + AI Chat
+════════════════════════════════ */
+
+function loadTeamData(){
+  var btn=document.getElementById("refreshBtn2");if(btn)btn.classList.add("spinning");
+  document.getElementById("teamContainer").innerHTML='<div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>';
+  google.script.run.withSuccessHandler(function(data){
+    if(btn)btn.classList.remove("spinning");
+    teamRawData=data;
+    document.getElementById("teamDateLabel").innerText=data.date||"Latest Data";
+    document.getElementById("dlToggleBtn2").style.display="flex";
+    var html="<table style='width:100%;border-collapse:collapse;table-layout:fixed;'>";
+    html+="<colgroup><col style='width:22%'><col style='width:13%'><col style='width:13%'><col style='width:13%'><col style='width:13%'><col style='width:13%'></colgroup>";
+    html+="<thead><tr style='background:linear-gradient(90deg,#0a2342,#0e4d6e);'>";
+    html+="<th style='color:#fff;font-size:12px;font-weight:700;padding:12px 14px;text-align:left;'>Team</th>";
+    html+="<th style='color:#fff;font-size:12px;padding:12px 10px;text-align:center;'>Deposit</th>";
+    html+="<th style='color:#e0f7fa;font-size:11px;padding:12px 10px;text-align:center;background:#0a5570;'>Old App</th>";
+    html+="<th style='color:#e0f7fa;font-size:11px;padding:12px 10px;text-align:center;background:#0a5570;'>New App</th>";
+    html+="<th style='color:#e0f7fa;font-size:11px;padding:12px 10px;text-align:center;background:#0a5570;'>With MOU</th>";
+    html+="<th style='color:#e0f7fa;font-size:11px;padding:12px 10px;text-align:center;background:#0a5570;'>W/O MOU</th>";
+    html+="</tr></thead><tbody>";
+    data.rows.forEach(function(r){
+      html+="<tr style='border-bottom:1px solid #e8f4f8;transition:background 0.12s;' onmouseover='this.style.background=\"#d6f0f5\"' onmouseout='this.style.background=\"\"'>";
+      html+="<td style='text-align:left;padding:12px 14px;font-size:13px;font-weight:700;color:#0a2342;'>"+r.teamName+"</td>";
+      html+="<td style='text-align:center;padding:12px 10px;font-size:13px;'>"+fmtNum(r.deposit)+"</td>";
+      html+="<td style='text-align:center;padding:12px 10px;font-size:13px;'>"+fmtNum(r.oldApp)+"</td>";
+      html+="<td style='text-align:center;padding:12px 10px;font-size:13px;'>"+fmtNum(r.newApp)+"</td>";
+      html+="<td style='text-align:center;padding:12px 10px;font-size:13px;'>"+fmtNum(r.withMOU)+"</td>";
+      html+="<td style='text-align:center;padding:12px 10px;font-size:13px;'>"+fmtNum(r.withoutMOU)+"</td></tr>";
+    });
+    var t=data.total;
+    html+="<tr style='background:linear-gradient(90deg,#0a2342,#0e4d6e);'>";
+    html+="<td style='padding:12px 14px;font-size:13px;font-weight:700;color:#fff;'>Grand Total</td>";
+    html+="<td style='text-align:center;padding:12px 10px;font-size:13px;font-weight:700;color:#ffd700;'>"+t.deposit+"</td>";
+    html+="<td style='text-align:center;padding:12px 10px;font-size:13px;font-weight:700;color:#ffd700;'>"+t.oldApp+"</td>";
+    html+="<td style='text-align:center;padding:12px 10px;font-size:13px;font-weight:700;color:#ffd700;'>"+t.newApp+"</td>";
+    html+="<td style='text-align:center;padding:12px 10px;font-size:13px;font-weight:700;color:#ffd700;'>"+t.withMOU+"</td>";
+    html+="<td style='text-align:center;padding:12px 10px;font-size:13px;font-weight:700;color:#ffd700;'>"+t.withoutMOU+"</td></tr>";
+    html+="</tbody></table>";
+    document.getElementById("teamContainer").innerHTML=html;
+  }).getTeamData();
+}
+
+function filterTeamTable(){
+  var q=document.getElementById("teamSearch").value.toLowerCase().trim();
+  document.querySelectorAll("#teamContainer tbody tr").forEach(function(row){
+    var n=row.cells[0]?row.cells[0].innerText.toLowerCase():"";
+    row.style.display=(!q||n.indexOf(q)!==-1)?"":"none";
+  });
+}
+
+/* Exports */
+function downloadJPG2(){html2canvas(document.getElementById("zoomWrapper2"),{scale:2,useCORS:true,backgroundColor:"#eef1f8"}).then(function(c){var a=document.createElement("a");a.download="KPI_Team.jpg";a.href=c.toDataURL("image/jpeg",0.95);a.click();});}
+function downloadExcel2(){if(!teamRawData)return;var ws=[["Team","Deposit","Old App","New App","With MOU","Without MOU"]];teamRawData.rows.forEach(function(r){ws.push([r.teamName,r.deposit,r.oldApp,r.newApp,r.withMOU,r.withoutMOU]);});var t=teamRawData.total;ws.push(["Grand Total",t.deposit,t.oldApp,t.newApp,t.withMOU,t.withoutMOU]);var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws),"Team KPI");XLSX.writeFile(wb,"KPI_Team.xlsx");}
+function downloadPDF2(){html2canvas(document.getElementById("zoomWrapper2"),{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(function(c){var w=window.open('','_blank');w.document.write('<html><body style="margin:0"><img src="'+c.toDataURL("image/jpeg",0.95)+'" style="width:100%"></body></html>');w.document.close();setTimeout(function(){w.print();w.close();},500);});}
+
+/* AI Chat */
+function getTeamDataContext(){
+  if(!teamRawData)return"Team data load nahi hua.";
+  var ctx="Team KPI ("+document.getElementById("teamDateLabel").innerText+"):\n";
+  teamRawData.rows.forEach(function(r){ctx+=r.teamName+": Deposit="+r.deposit+", OldApp="+r.oldApp+", NewApp="+r.newApp+", WithMOU="+r.withMOU+", WithoutMOU="+r.withoutMOU+"\n";});
+  var t=teamRawData.total;
+  return ctx+"Grand Total: Deposit="+t.deposit+", OldApp="+t.oldApp+", NewApp="+t.newApp+", WithMOU="+t.withMOU+", WithoutMOU="+t.withoutMOU;
+}
+function addAIMessage(text,isUser){
+  var msgs=document.getElementById("aiMessages");
+  var div=document.createElement("div");div.className="ai-msg "+(isUser?"ai-msg-user":"ai-msg-bot");
+  div.innerHTML="<div class='ai-msg-avatar'>"+(isUser?"You":"AI")+"</div><div class='ai-msg-bubble'>"+text+"</div>";
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;
+}
+function clearAIChat(){
+  aiChatHistory=[];
+  document.getElementById("aiMessages").innerHTML="<div class='ai-msg ai-msg-bot'><div class='ai-msg-avatar'>AI</div><div class='ai-msg-bubble'>Chat clear! Koi bhi analysis poochho. 😊</div></div>";
+}
+function sendAIMessage(){
+  var input=document.getElementById("aiInput"),q=input.value.trim();
+  if(!q)return;input.value="";
+  addAIMessage(q,true);
+  if(!teamRawData){addAIMessage("Pehle Refresh dabao!",false);return;}
+  var td=addAIMessage("Soch raha hoon... 🤔",false);
+  td.querySelector(".ai-msg-bubble").classList.add("typing");
+  aiChatHistory.push({role:"user",content:q});
+  google.script.run
+    .withSuccessHandler(function(reply){
+      td.remove();
+      if(!reply){addAIMessage("Response nahi mila.",false);return;}
+      aiChatHistory.push({role:"assistant",content:reply});
+      addAIMessage(reply.replace(/\n/g,"<br>"),false);
+    })
+    .withFailureHandler(function(err){td.remove();addAIMessage("❌ "+err.message,false);})
+    .getAIAnalysis(getTeamDataContext(),aiChatHistory);
+}
+</script>
