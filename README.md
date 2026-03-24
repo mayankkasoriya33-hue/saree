@@ -7,13 +7,13 @@ A multi-page KPI dashboard built with Google Apps Script + HTML Service.
 ## File Structure
 
 ```
-Code.gs        ← All backend functions (getData, getTeamData, getEnrollmentData, etc.)
-index.html     ← Shell: sidebar, shared CSS, calculator, shared JS. Includes all pages via <?!= include('PageN') ?>
-Page1.html     ← Individual KPI (Page 1 HTML + JS)
-Page2.html     ← Team KPI B2B + AI Chat (Page 2 HTML + JS)
-Page3.html     ← Enrollment table + Pivot Modal (Page 3 HTML + JS)
-Page4.html     ← On-Field KPI (Page 4 HTML + JS)
-Page5.html     ← Department Directory (Page 5 HTML + JS)
+Code.gs            ← All backend functions (getData, getTeamData, getEnrollmentData, etc.)
+index.html         ← Shell: sidebar, shared CSS, calculator, shared JS
+IndividualKPI.html ← Page 1 — Individual KPI table + filters + chart + export
+TeamKPI.html       ← Page 2 — Team KPI (B2B) + AI Gemini chatbox
+Enrollment.html    ← Page 3 — Enrollment table + Pivot Modal
+OnFieldKPI.html    ← Page 4 — On-Field KPI table
+DeptList.html      ← Page 5 — Department Directory (team cards + member profiles)
 ```
 
 ---
@@ -22,13 +22,13 @@ Page5.html     ← Department Directory (Page 5 HTML + JS)
 
 1. Open [script.google.com](https://script.google.com) and create a new project.
 2. Copy **Code.gs** content into the default `Code.gs` file.
-3. Create **5 HTML files** (File → New → HTML file) named exactly:
+3. Create **6 HTML files** (File → New → HTML file) named exactly:
    - `index`
-   - `Page1`
-   - `Page2`
-   - `Page3`
-   - `Page4`
-   - `Page5`
+   - `IndividualKPI`
+   - `TeamKPI`
+   - `Enrollment`
+   - `OnFieldKPI`
+   - `DeptList`
 4. Paste each file's content from this repo into the matching Apps Script HTML file.
 5. Run `setupProperties` once to save your Gemini API key:
    - Replace `APNI_GEMINI_API_KEY_YAHAN_DAALO` with your real key inside `setupProperties()`.
@@ -55,11 +55,11 @@ When Google Apps Script serves `index.html`, it calls `include('Page1')`, which 
 
 | Want to change... | Edit only... |
 |---|---|
-| Page 1 (Individual KPI) table/filters | `Page1.html` |
-| Page 2 (Team KPI) table or AI chat | `Page2.html` |
-| Page 3 (Enrollment) filters, pivot modal | `Page3.html` |
-| Page 4 (On-Field KPI) | `Page4.html` |
-| Page 5 (Department List) | `Page5.html` |
+| Page 1 — Individual KPI table/filters | `IndividualKPI.html` |
+| Page 2 — Team KPI table or AI chat | `TeamKPI.html` |
+| Page 3 — Enrollment filters, pivot modal | `Enrollment.html` |
+| Page 4 — On-Field KPI | `OnFieldKPI.html` |
+| Page 5 — Department List | `DeptList.html` |
 | Sidebar, global CSS, calculator, helpers | `index.html` |
 | Any backend data function | `Code.gs` |
 

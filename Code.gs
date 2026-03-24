@@ -29,9 +29,12 @@ function doGet() {
 
 // ─────────────────────────────────────────
 // include() helper
-// Usage inside any .html file:
-//   <?!= include('Page1') ?>
-// This injects the raw HTML of Page1.html
+// Usage inside index.html:
+//   <?!= include('IndividualKPI') ?>
+//   <?!= include('TeamKPI') ?>
+//   <?!= include('Enrollment') ?>
+//   <?!= include('OnFieldKPI') ?>
+//   <?!= include('DeptList') ?>
 // ─────────────────────────────────────────
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
