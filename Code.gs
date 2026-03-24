@@ -17,10 +17,12 @@ function authorizeMe() {
 }
 
 // ─────────────────────────────────────────
-// doGet — serves index.html
+// doGet — serves index.html as a template
+// createTemplateFromFile processes <?!= ?> tags
 // ─────────────────────────────────────────
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index')
+  return HtmlService.createTemplateFromFile('index')
+    .evaluate()
     .setTitle("CRM KPI Dashboard")
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
