@@ -1,0 +1,499 @@
+<!-- ══════════════════════════════════════
+     PAGE 3 — Enrollment + Pivot Modal
+     Edit only this file for Page 3 changes
+══════════════════════════════════════ -->
+<style>
+/* Stat cards */
+.stats-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.stat-card{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;min-width:120px;max-width:220px;border-radius:8px;padding:11px 18px;text-align:center;cursor:default;transition:transform 0.15s,filter 0.15s;border:none;background:#f39c12;}
+.stat-card:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 6px 18px rgba(0,0,0,0.18);}
+.stat-card .stat-num{font-size:20px;font-weight:900;line-height:1;color:#fff;}
+.stat-card .stat-label{font-size:13px;font-weight:700;color:#fff;}
+.stat-card.green{background:#27ae60;}
+.stat-card.red{background:#e74c3c;}
+.stat-card.amber{background:#e67e22;}
+
+/* Enrollment table */
+.enroll-table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:auto;max-height:calc(100vh - 185px);}
+.enroll-table-wrap table{table-layout:auto;border-collapse:collapse;width:max-content;min-width:100%;}
+.enroll-table-wrap thead th{position:sticky;top:0;z-index:10;background:#0a2342;color:#fff;font-size:10px;font-weight:700;padding:9px 10px;text-align:left;white-space:nowrap;border-right:1px solid rgba(255,255,255,0.1);box-shadow:0 2px 4px rgba(0,0,0,0.12);}
+.enroll-table-wrap tbody td{font-size:11px;padding:7px 10px;white-space:nowrap;color:#1a2e3b;border-bottom:1px solid #e8f4f8;}
+.status-active{background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:20px;font-size:8px;font-weight:600;}
+.status-refund{background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:20px;font-size:8px;font-weight:600;}
+.status-defer{background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:20px;font-size:8px;font-weight:600;}
+
+@media(max-width:768px){
+  .stats-row{gap:6px;}
+  .stat-card{min-width:80px;padding:10px 10px;}
+  .stat-card .stat-num{font-size:22px;}
+}
+</style>
+
+<div class="page" id="page-3">
+
+  <!-- ROW 1: Date + action buttons -->
+  <div class="controls-bar" style="flex-wrap:wrap;gap:7px;margin-bottom:7px;">
+    <div class="control-group">
+      <label>From</label>
+      <input type="date" id="enStartDate" onchange="loadEnrollData()"
+        style="border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;transition:border-color 0.18s;"
+        onfocus="this.style.borderColor='#0a7c8c'" onblur="this.style.borderColor='#e5e7eb'">
+    </div>
+    <div class="control-group">
+      <label>To</label>
+      <input type="date" id="enEndDate" onchange="loadEnrollData()"
+        style="border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;transition:border-color 0.18s;"
+        onfocus="this.style.borderColor='#0a7c8c'" onblur="this.style.borderColor='#e5e7eb'">
+    </div>
+    <div class="controls-divider"></div>
+
+    <!-- Count toggle -->
+    <button id="countToggleBtn" onclick="toggleCountCards()"
+      style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;border:1.5px solid #0a7c8c;background:#fff;color:#0a7c8c;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;transition:all 0.18s;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Count
+    </button>
+
+    <!-- RM & Team Payment Report -->
+    <button onclick="showPivotModal()"
+      style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;border:1.5px solid #0e4d6e;background:#fff;color:#0e4d6e;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;transition:all 0.18s;"
+      onmouseover="this.style.background='#e8f0fa';this.style.borderColor='#0a2342';this.style.color='#0a2342'"
+      onmouseout="this.style.background='#fff';this.style.borderColor='#0e4d6e';this.style.color='#0e4d6e'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      RM &amp; Team Payment Report
+    </button>
+
+    <!-- Export Excel -->
+    <button onclick="event.stopPropagation();downloadEnrollExcel()"
+      style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;border:1.5px solid #27ae60;background:#fff;color:#27ae60;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;transition:all 0.18s;"
+      onmouseover="this.style.background='#d1fae5';this.style.borderColor='#1e8449';this.style.color='#1e8449'"
+      onmouseout="this.style.background='#fff';this.style.borderColor='#27ae60';this.style.color='#27ae60'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+      Export to Excel
+    </button>
+
+    <!-- General search -->
+    <div style="position:relative;display:flex;align-items:center;flex:1;min-width:150px;max-width:320px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" width="13" height="13" style="position:absolute;left:8px;pointer-events:none;z-index:1;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="enGeneralSearch" placeholder="Search University, Student, Agency, Country, Intake, Date..."
+        oninput="applyEnrollFilters()"
+        style="padding:5px 24px 5px 26px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:11px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;width:100%;transition:border-color 0.18s;"
+        onfocus="this.style.borderColor='#0a7c8c';this.style.background='#fff'"
+        onblur="this.style.borderColor='#e5e7eb';this.style.background='#f9fafb'">
+      <button onclick="document.getElementById('enGeneralSearch').value='';applyEnrollFilters();"
+        style="position:absolute;right:6px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:13px;">✕</button>
+    </div>
+
+    <!-- Refresh -->
+    <button class="btn-refresh" id="refreshBtn3" onclick="loadEnrollData()" style="flex-shrink:0;white-space:nowrap;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+
+    <!-- Clear Filters -->
+    <button onclick="clearAllEnrollFilters()" style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;border:1.5px solid #dc2626;background:#fff;color:#dc2626;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;transition:all 0.18s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fff'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- ROW 2: Team / RM / Onboarding person search -->
+  <div class="controls-bar" style="flex-wrap:wrap;gap:7px;margin-bottom:10px;">
+    <div class="control-group">
+      <label>Team</label>
+      <div style="position:relative;display:flex;align-items:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" width="13" height="13" style="position:absolute;left:8px;pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="enTeamSearch" placeholder="All Teams" oninput="onEnrollTeamSearchChange()"
+          style="padding:5px 24px 5px 26px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;width:150px;transition:border-color 0.18s;"
+          onfocus="this.style.borderColor='#0a7c8c';this.style.background='#fff'"
+          onblur="this.style.borderColor='#e5e7eb';this.style.background='#f9fafb'">
+        <button onclick="document.getElementById('enTeamSearch').value='';onEnrollTeamSearchChange();"
+          style="position:absolute;right:5px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;">✕</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>RM</label>
+      <div style="position:relative;display:flex;align-items:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" width="13" height="13" style="position:absolute;left:8px;pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="enRMTextSearch" placeholder="All RMs" oninput="applyEnrollFilters()"
+          style="padding:5px 24px 5px 26px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;width:150px;transition:border-color 0.18s;"
+          onfocus="this.style.borderColor='#0a7c8c';this.style.background='#fff'"
+          onblur="this.style.borderColor='#e5e7eb';this.style.background='#f9fafb'">
+        <button onclick="document.getElementById('enRMTextSearch').value='';applyEnrollFilters();"
+          style="position:absolute;right:5px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;">✕</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>Onboarding Person</label>
+      <div style="position:relative;display:flex;align-items:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" width="13" height="13" style="position:absolute;left:8px;pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="enRMSearch" placeholder="Search onboarding person..." oninput="applyEnrollFilters()"
+          style="padding:5px 24px 5px 26px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;color:#1a1d2e;background:#f9fafb;outline:none;width:200px;transition:border-color 0.18s;"
+          onfocus="this.style.borderColor='#0a7c8c';this.style.background='#fff'"
+          onblur="this.style.borderColor='#e5e7eb';this.style.background='#f9fafb'">
+        <button onclick="document.getElementById('enRMSearch').value='';applyEnrollFilters();"
+          style="position:absolute;right:5px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:12px;">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Count cards + table -->
+  <div id="enrollWrapper">
+    <div class="stats-row" id="enrollCountCards" style="display:none;margin-bottom:10px;">
+      <div class="stat-card" onclick="filterByStatus('')" title="Show all" style="cursor:pointer;">
+        <span class="stat-label">Total</span><span class="stat-num" id="enTotal">-</span>
+      </div>
+      <div class="stat-card green" onclick="filterByStatus('active')" title="Show Active only" style="cursor:pointer;">
+        <span class="stat-label">Active</span><span class="stat-num" id="enActive">-</span>
+      </div>
+      <div class="stat-card red" onclick="filterByStatus('refund')" title="Show Refund only" style="cursor:pointer;">
+        <span class="stat-label">Refund</span><span class="stat-num" id="enRefund">-</span>
+      </div>
+      <div class="stat-card amber" onclick="filterByStatus('defer')" title="Show Defer only" style="cursor:pointer;">
+        <span class="stat-label">Defer</span><span class="stat-num" id="enDefer">-</span>
+      </div>
+    </div>
+    <div class="enroll-table-wrap" id="enrollTableWrap">
+      <div id="enrollContainer" onclick="event.stopPropagation()">
+        <div class="loading-state">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Refresh dabao ya date select karo (blank = all data)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PIVOT MODAL ══ -->
+  <div id="pivotModal" style="display:none;position:fixed;inset:0;background:rgba(10,35,66,0.55);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;width:620px;max-width:96vw;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(10,35,66,0.28);animation:slideUp 0.26s cubic-bezier(0.22,1,0.36,1) both;">
+      <!-- Header -->
+      <div style="background:linear-gradient(120deg,#0a2342,#0e4d6e,#0a7c8c);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#fff;" id="pivotModalTitle">RM &amp; Team Wise Count</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;" id="pivotModalSubtitle">Loading...</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button id="pivotExportBtn" onclick="exportPivotJPG()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:none;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export JPG
+          </button>
+          <button onclick="closePivotModal()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+      </div>
+      <!-- Tabs -->
+      <div style="display:flex;padding:0 16px;border-bottom:1px solid #e8f4f8;flex-shrink:0;background:#fff;overflow-x:auto;">
+        <button id="pivotTeamTab" onclick="switchPivotTab('team')" style="padding:10px 14px;border:none;border-bottom:2.5px solid #0a2342;background:transparent;font-size:11px;font-weight:700;color:#0a2342;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;">👥 Team Wise</button>
+        <button id="pivotAllRMTab" onclick="switchPivotTab('allrm')" style="padding:10px 14px;border:none;border-bottom:2.5px solid transparent;background:transparent;font-size:11px;font-weight:600;color:#6b7280;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;">📋 B2B RM Wise</button>
+        <button id="pivotManagedByTab" onclick="switchPivotTab('managedby')" style="padding:10px 14px;border:none;border-bottom:2.5px solid transparent;background:transparent;font-size:11px;font-weight:600;color:#6b7280;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;">🏃 On-Field</button>
+      </div>
+      <!-- Body -->
+      <div style="overflow-y:auto;flex:1;padding:14px 16px;" id="pivotBody">
+        <div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════
+   PAGE 3 — Enrollment Logic
+════════════════════════════════ */
+
+var _currentStatusFilter="";
+
+function toggleCountCards(){
+  countCardsVisible=!countCardsVisible;
+  document.getElementById("enrollCountCards").style.display=countCardsVisible?"flex":"none";
+  var b=document.getElementById("countToggleBtn");
+  if(countCardsVisible){b.style.background="#0a2342";b.style.color="#ffd700";b.style.borderColor="#0a2342";b.classList.add("active-count");}
+  else{b.style.background="#fff";b.style.color="#0a7c8c";b.style.borderColor="#0a7c8c";b.classList.remove("active-count");}
+}
+
+function filterByStatus(status){
+  _currentStatusFilter=status;
+  if(!enrollRawData)return;
+  var teamQ=(document.getElementById("enTeamSearch")?document.getElementById("enTeamSearch").value:"").trim().toLowerCase();
+  var rmQ=(document.getElementById("enRMTextSearch")?document.getElementById("enRMTextSearch").value:"").trim().toLowerCase();
+  var obQ=(document.getElementById("enRMSearch")?document.getElementById("enRMSearch").value:"").trim().toLowerCase();
+  var genQ=(document.getElementById("enGeneralSearch")?document.getElementById("enGeneralSearch").value:"").trim().toLowerCase();
+  var headers=enrollRawData.headers||[];
+  var genCols=[];
+  var genKeywords=["payment date","student name","agency name","country","university","intake"];
+  headers.forEach(function(h,i){var hl=(h||"").toLowerCase();for(var k=0;k<genKeywords.length;k++){if(hl.indexOf(genKeywords[k])!==-1){genCols.push(i);break;}}});
+  var validRMs=null;
+  if(teamQ){validRMs={};var tRMs=window._enTeamRMs||{};Object.keys(tRMs).forEach(function(t){if(t.toLowerCase().indexOf(teamQ)!==-1){Object.keys(tRMs[t]).forEach(function(r){validRMs[r.toLowerCase()]=1;});}});}
+  var filtered=enrollRawData.rows.filter(function(r){
+    var team=(r.team||"").toLowerCase(),rm=(r.rm||"").toLowerCase(),ob=(r.onboardedBy||"").toLowerCase(),mb=(r.managedBy||"").toLowerCase();
+    if(teamQ&&team.indexOf(teamQ)===-1)return false;
+    if(rmQ&&rm.indexOf(rmQ)===-1)return false;
+    if(validRMs&&rm&&!validRMs[rm])return false;
+    if(obQ&&ob.indexOf(obQ)===-1&&mb.indexOf(obQ)===-1)return false;
+    if(genQ&&genCols.length>0){var hit=false;for(var ci=0;ci<genCols.length;ci++){if((r.cells[genCols[ci]]||"").toLowerCase().indexOf(genQ)!==-1){hit=true;break;}}if(!hit)return false;}
+    if(status){var sl=(r.status||"").toLowerCase();if(status==="active"&&sl.indexOf("active")===-1)return false;if(status==="refund"&&sl.indexOf("refund")===-1)return false;if(status==="defer"&&sl.indexOf("defer")===-1)return false;}
+    return true;
+  });
+  document.querySelectorAll(".stat-card").forEach(function(c){c.style.outline="none";c.style.boxShadow="";});
+  if(status){var map={active:".stat-card.green",refund:".stat-card.red",defer:".stat-card.amber"};var el=document.querySelector(map[status]);if(el)el.style.outline="3px solid #fff";}
+  renderEnrollTable(enrollRawData.headers,filtered);
+}
+
+function clearAllEnrollFilters(){
+  document.getElementById("enStartDate").value="";
+  document.getElementById("enEndDate").value="";
+  document.getElementById("enTeamSearch").value="";
+  document.getElementById("enRMTextSearch").value="";
+  document.getElementById("enRMSearch").value="";
+  document.getElementById("enGeneralSearch").value="";
+  loadEnrollData();
+}
+
+function populateEnrollFilterOptions(rows){
+  var teams={},teamRMs={};
+  rows.forEach(function(r){if(r.team){teams[r.team]=1;if(!teamRMs[r.team])teamRMs[r.team]={};if(r.rm)teamRMs[r.team][r.rm]=1;}});
+  window._enTeams=teams;window._enTeamRMs=teamRMs;
+}
+
+function onEnrollTeamSearchChange(){
+  document.getElementById("enRMTextSearch").value="";
+  applyEnrollFilters();
+}
+
+function applyEnrollFilters(){
+  if(!enrollRawData)return;
+  var teamQ=(document.getElementById("enTeamSearch")?document.getElementById("enTeamSearch").value:"").trim().toLowerCase();
+  var rmQ=(document.getElementById("enRMTextSearch")?document.getElementById("enRMTextSearch").value:"").trim().toLowerCase();
+  var obQ=(document.getElementById("enRMSearch")?document.getElementById("enRMSearch").value:"").trim().toLowerCase();
+  var genQ=(document.getElementById("enGeneralSearch")?document.getElementById("enGeneralSearch").value:"").trim().toLowerCase();
+  var validRMs=null;
+  if(teamQ){validRMs={};var tRMs=window._enTeamRMs||{};Object.keys(tRMs).forEach(function(t){if(t.toLowerCase().indexOf(teamQ)!==-1){Object.keys(tRMs[t]).forEach(function(r){validRMs[r.toLowerCase()]=1;});}});}
+  var headers=enrollRawData.headers||[];
+  var genCols=[];
+  var genKeywords=["payment date","student name","agency name","country","university","intake"];
+  headers.forEach(function(h,i){var hl=(h||"").toLowerCase();for(var k=0;k<genKeywords.length;k++){if(hl.indexOf(genKeywords[k])!==-1){genCols.push(i);break;}}});
+  var filtered=enrollRawData.rows.filter(function(r){
+    var team=(r.team||"").toLowerCase(),rm=(r.rm||"").toLowerCase(),ob=(r.onboardedBy||"").toLowerCase(),mb=(r.managedBy||"").toLowerCase();
+    if(teamQ&&team.indexOf(teamQ)===-1)return false;
+    if(rmQ&&rm.indexOf(rmQ)===-1)return false;
+    if(validRMs&&rm&&!validRMs[rm])return false;
+    if(obQ&&ob.indexOf(obQ)===-1&&mb.indexOf(obQ)===-1)return false;
+    if(genQ&&genCols.length>0){var hit=false;for(var ci=0;ci<genCols.length;ci++){if((r.cells[genCols[ci]]||"").toLowerCase().indexOf(genQ)!==-1){hit=true;break;}}if(!hit)return false;}
+    return true;
+  });
+  renderEnrollTable(enrollRawData.headers,filtered);
+}
+
+function loadEnrollData(){
+  var btn=document.getElementById("refreshBtn3");if(btn)btn.classList.add("spinning");
+  var s=document.getElementById("enStartDate").value,e=document.getElementById("enEndDate").value;
+  document.getElementById("enrollContainer").innerHTML='<div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>';
+  google.script.run.withSuccessHandler(function(data){
+    if(btn)btn.classList.remove("spinning");
+    enrollRawData=data;
+    populateEnrollFilterOptions(data.rows);
+    applyEnrollFilters();
+  }).getEnrollmentData(s,e);
+}
+
+function renderEnrollTable(headers,rows){
+  var a=0,r=0,d=0;
+  rows.forEach(function(row){var sl=(row.status||"").toLowerCase();if(sl.indexOf("active")!==-1)a++;else if(sl.indexOf("refund")!==-1)r++;else if(sl.indexOf("defer")!==-1)d++;});
+  document.getElementById("enTotal").innerText=rows.length;
+  document.getElementById("enActive").innerText=a;
+  document.getElementById("enRefund").innerText=r;
+  document.getElementById("enDefer").innerText=d;
+  if(!headers||!headers.length){document.getElementById("enrollContainer").innerHTML='<div class="loading-state">No data found</div>';return;}
+
+  var sci=-1,b2bRmCol=-1,teamLeaderCol=-1,onboardedByCol=-1,managedByCol=-1;
+  headers.forEach(function(h,i){
+    var hl=(h||"").toLowerCase();
+    if(hl.indexOf("student status")!==-1||hl==="status")sci=i;
+    if(hl.indexOf("b2b rm")!==-1||hl==="b2b rm")b2bRmCol=i;
+    else if(hl.indexOf("team leader")!==-1||hl==="team leader")teamLeaderCol=i;
+    if(hl.indexOf("onboarded by")!==-1)onboardedByCol=i;
+    if(hl.indexOf("managed by")!==-1)managedByCol=i;
+  });
+  // Override: student status takes priority over generic status
+  headers.forEach(function(h,i){if((h||"").toLowerCase().indexOf("student status")!==-1)sci=i;});
+
+  var B2B_RM_COLOR="#0a2342",TEAM_COLOR="#16a085",ONBOARDED_COLOR="#27ae60",MANAGED_COLOR="#e67e22";
+  function nameBadge(v,bgColor){if(!v||v==="-"||v==="")return'<td style="padding:6px 10px;text-align:center;white-space:nowrap;font-size:11px;color:#9ca3af;">-</td>';return'<td style="padding:5px 8px;text-align:center;white-space:nowrap;"><span style="display:inline-block;background:'+bgColor+';color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;line-height:1.3;white-space:nowrap;">'+v+'</span></td>';}
+
+  var html='<table style="width:100%;border-collapse:collapse;table-layout:auto;"><thead><tr>';
+  headers.forEach(function(h,i){
+    var hl=(h||"").toLowerCase(),align=i===0?'center':'left',displayH=h||'',extraStyle='';
+    if(hl.indexOf("student status")!==-1){displayH='Student Status<br><span style="font-weight:600;opacity:0.8;font-size:9px;">(Active/Refund/Defer)</span>';align='center';extraStyle='min-width:100px;max-width:130px;';}
+    if(hl.indexOf("student id")!==-1)align='center';
+    html+='<th style="position:sticky;top:0;z-index:10;background:#0a2342;color:#fff;font-size:10px;font-weight:700;padding:9px 10px;text-align:'+align+';white-space:nowrap;border-right:1px solid rgba(255,255,255,0.1);box-shadow:0 2px 4px rgba(0,0,0,0.12);'+extraStyle+'">'+displayH+'</th>';
+  });
+  html+='</tr></thead><tbody>';
+  rows.forEach(function(row,idx){
+    html+='<tr style="background:'+(idx%2===0?'#f4fbfd':'#fff')+';border-bottom:1px solid #e8f4f8;transition:background 0.12s;" onmouseover=\'this.style.background="#d6f0f5"\' onmouseout=\'this.style.background="'+(idx%2===0?'#f4fbfd':'#fff')+'";\'>';
+    row.cells.forEach(function(cell,ci){
+      var v=cell||'';
+      if(ci===0){html+='<td style="padding:6px 10px;text-align:center;white-space:nowrap;font-size:11px;color:#6b7280;font-weight:600;">'+(idx+1)+'</td>';return;}
+      if(ci===sci&&v){var sc=v.toLowerCase().indexOf('active')!==-1?'status-active':v.toLowerCase().indexOf('refund')!==-1?'status-refund':'status-defer';html+='<td style="padding:6px 10px;text-align:center;white-space:nowrap;"><span class="'+sc+'">'+v+'</span></td>';return;}
+      if(ci===b2bRmCol){html+=nameBadge(v,B2B_RM_COLOR);return;}
+      if(ci===teamLeaderCol){html+=nameBadge(v,TEAM_COLOR);return;}
+      if(ci===onboardedByCol){html+=nameBadge(v,ONBOARDED_COLOR);return;}
+      if(ci===managedByCol){html+=nameBadge(v,MANAGED_COLOR);return;}
+      var isNum=v!==''&&!isNaN(v.replace(/,/g,''));
+      var hl2=(headers[ci]||"").toLowerCase();
+      var cellAlign=(isNum||hl2.indexOf("student id")!==-1)?'center':'left';
+      html+='<td style="padding:6px 10px;text-align:'+cellAlign+';white-space:nowrap;font-size:11px;color:#1a2e3b;">'+v+'</td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById("enrollContainer").innerHTML=html;
+}
+
+function downloadEnrollExcel(){
+  if(!enrollRawData)return;
+  var teamQ=(document.getElementById("enTeamSearch")?document.getElementById("enTeamSearch").value:"").trim().toLowerCase();
+  var rmQ=(document.getElementById("enRMTextSearch")?document.getElementById("enRMTextSearch").value:"").trim().toLowerCase();
+  var obQ=(document.getElementById("enRMSearch")?document.getElementById("enRMSearch").value:"").trim().toLowerCase();
+  var genQ=(document.getElementById("enGeneralSearch")?document.getElementById("enGeneralSearch").value:"").trim().toLowerCase();
+  var headers=enrollRawData.headers||[];
+  var genCols=[];
+  var genKeywords=["payment date","student name","agency name","country","university","intake"];
+  headers.forEach(function(h,i){var hl=(h||"").toLowerCase();for(var k=0;k<genKeywords.length;k++){if(hl.indexOf(genKeywords[k])!==-1){genCols.push(i);break;}}});
+  var validRMs=null;
+  if(teamQ){validRMs={};var tRMs=window._enTeamRMs||{};Object.keys(tRMs).forEach(function(t){if(t.toLowerCase().indexOf(teamQ)!==-1){Object.keys(tRMs[t]).forEach(function(r){validRMs[r.toLowerCase()]=1;});}});}
+  var filtered=enrollRawData.rows.filter(function(r){
+    var team=(r.team||"").toLowerCase(),rm=(r.rm||"").toLowerCase(),ob=(r.onboardedBy||"").toLowerCase(),mb=(r.managedBy||"").toLowerCase();
+    if(teamQ&&team.indexOf(teamQ)===-1)return false;
+    if(rmQ&&rm.indexOf(rmQ)===-1)return false;
+    if(validRMs&&rm&&!validRMs[rm])return false;
+    if(obQ&&ob.indexOf(obQ)===-1&&mb.indexOf(obQ)===-1)return false;
+    if(genQ&&genCols.length>0){var hit=false;for(var ci=0;ci<genCols.length;ci++){if((r.cells[genCols[ci]]||"").toLowerCase().indexOf(genQ)!==-1){hit=true;break;}}if(!hit)return false;}
+    return true;
+  });
+  var ws=[enrollRawData.headers];
+  filtered.forEach(function(r,idx){var row=r.cells.slice();row[0]=idx+1;ws.push(row);});
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws),"Enrollment");
+  XLSX.writeFile(wb,"Enrollment.xlsx");
+}
+
+/* ══ PIVOT MODAL ══ */
+function showPivotModal(){document.getElementById("pivotModal").style.display="flex";switchPivotTab("team");}
+function closePivotModal(){document.getElementById("pivotModal").style.display="none";}
+
+function fmtPivotDate(d){if(!d)return"";var parts=d.split("-");var months=["","January","February","March","April","May","June","July","August","September","October","November","December"];return parts[2]+" "+months[parseInt(parts[1])]+" "+parts[0];}
+
+function getPivotDateLabel(){
+  var s=document.getElementById("enStartDate").value,e=document.getElementById("enEndDate").value;
+  if(!s&&!e){var today=new Date();var yy=today.getFullYear();var dd=String(today.getDate()).padStart(2,'0');var months=["","January","February","March","April","May","June","July","August","September","October","November","December"];var todayFmt=dd+" "+months[today.getMonth()+1]+" "+yy;return"01 October "+yy+" to "+todayFmt;}
+  if(!s){var today2=new Date();var yy2=today2.getFullYear();return"01 October "+yy2+" to "+fmtPivotDate(e);}
+  if(!e){var today3=new Date();var dd3=String(today3.getDate()).padStart(2,'0');var months3=["","January","February","March","April","May","June","July","August","September","October","November","December"];return fmtPivotDate(s)+" to "+dd3+" "+months3[today3.getMonth()+1]+" "+today3.getFullYear();}
+  return fmtPivotDate(s)+" to "+fmtPivotDate(e);
+}
+
+function switchPivotTab(tab){
+  currentPivotTab=tab;
+  var tabs={team:"pivotTeamTab",allrm:"pivotAllRMTab",managedby:"pivotManagedByTab"};
+  var titles={team:"Team Wise Payment Record",allrm:"B2B RM Wise Payment Report",managedby:"On-Field Total Payment"};
+  Object.keys(tabs).forEach(function(k){var el=document.getElementById(tabs[k]);if(!el)return;el.style.borderBottom=(k===tab)?"2.5px solid #0a2342":"2.5px solid transparent";el.style.color=(k===tab)?"#0a2342":"#6b7280";el.style.fontWeight=(k===tab)?"700":"600";});
+  document.getElementById("pivotModalTitle").innerText=titles[tab]||"Payment Report";
+  document.getElementById("pivotModalSubtitle").innerText="📅 "+getPivotDateLabel();
+  if(tab==="allrm")buildAllRMTable();
+  else if(tab==="managedby")buildManagedByTable();
+  else buildPivotTable(tab);
+}
+
+function buildPivotTable(tab){
+  var rows=enrollRawData?enrollRawData.rows:[];
+  var cmap={},teamRMMap={};
+  rows.forEach(function(r){
+    if(tab==="team"){var t=r.team||"Unknown";cmap[t]=(cmap[t]||0)+1;if(!teamRMMap[t])teamRMMap[t]={};var rm=r.rm||"Unknown";teamRMMap[t][rm]=(teamRMMap[t][rm]||0)+1;}
+    else{var k=r.rm||"Unknown";cmap[k]=(cmap[k]||0)+1;}
+  });
+  if(tab==="team")window._teamRMMap=teamRMMap;
+  var keys=Object.keys(cmap).sort(function(a,b){return cmap[b]-cmap[a];});
+  var html='<div id="pivotTableWrap"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#0a2342;"><th style="color:#fff;padding:9px 12px;text-align:center;width:45px;">Sr.</th><th style="color:#fff;padding:9px 12px;text-align:center;">'+(tab==="team"?"Team Name":"B2B RM Name")+'</th><th style="color:#fff;padding:9px 12px;text-align:center;">Total</th></tr></thead><tbody id="pivotMainTbody">';
+  keys.forEach(function(k,i){
+    var isTeam=(tab==="team");
+    if(isTeam){
+      html+='<tr id="pt_row_'+i+'" style="background:'+(i%2===0?'#f4fbfd':'#fff')+';border-bottom:1px solid #e8f4f8;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'#d6f0f5\'" onmouseout="this.style.background=\''+(i%2===0?'#f4fbfd':'#fff')+'\'" onclick="downloadTeamReport(\''+k.replace(/'/g,"\\'")+'\')" title="Click to download '+k+' report">';
+      html+='<td style="text-align:center;padding:10px 12px;color:#6b7280;">'+(i+1)+'</td>';
+      html+='<td style="padding:10px 12px;font-weight:700;color:#0a2342;text-align:center;">'+k;
+      if(k.toLowerCase().indexOf("avantika")!==-1)html+='<div style="font-size:9px;color:#9ca3af;font-style:italic;font-weight:400;margin-top:2px;">Merged in Team Jinisha from 11-03-2026</div>';
+      html+='</td><td style="text-align:center;padding:10px 12px;font-weight:900;color:#0a7c8c;font-size:15px;">'+cmap[k]+'</td></tr>';
+    } else {
+      html+='<tr style="background:'+(i%2===0?'#f4fbfd':'#fff')+';border-bottom:1px solid #e8f4f8;"><td style="text-align:center;padding:9px 12px;color:#6b7280;">'+(i+1)+'</td><td style="text-align:center;padding:9px 12px;font-weight:700;color:#0a2342;">'+k+'</td><td style="text-align:center;padding:9px 12px;font-weight:900;color:#0a7c8c;font-size:15px;">'+cmap[k]+'</td></tr>';
+    }
+  });
+  var total=Object.values(cmap).reduce(function(a,b){return a+b;},0);
+  html+='<tr style="background:#0a2342;"><td colspan="2" style="padding:10px 12px;font-weight:800;color:#fff;text-align:center;">Grand Total</td><td style="text-align:center;padding:10px 12px;font-weight:900;color:#ffd700;font-size:15px;">'+total+'</td></tr></tbody></table>';
+  if(tab==="team")html+='<div style="font-size:10px;color:#9ca3af;text-align:center;margin-top:8px;padding:6px;">Click on any team row to download that team\'s report</div>';
+  html+='</div>';
+  document.getElementById("pivotBody").innerHTML=html;
+}
+
+function downloadTeamReport(teamName){
+  var rmMap=window._teamRMMap||{},rms=rmMap[teamName]||{};
+  var rmKeys=Object.keys(rms).sort(function(a,b){return rms[b]-rms[a];});
+  var dateL=getPivotDateLabel(),total=rmKeys.reduce(function(s,r){return s+rms[r];},0);
+  var div=document.createElement("div");div.style.cssText="position:fixed;left:-9999px;top:0;width:520px;background:#fff;font-family:Inter,sans-serif;";
+  var hdr=document.createElement("div");hdr.style.cssText="background:linear-gradient(120deg,#0a2342,#0e4d6e,#0a7c8c);padding:20px 22px;text-align:center;";
+  hdr.innerHTML='<div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:5px;">'+teamName+'</div><div style="font-size:12px;color:rgba(255,255,255,0.75);">RM Wise Payment Report</div><div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px;">📅 '+dateL+'</div>';
+  div.appendChild(hdr);
+  var tbl=document.createElement("div"),tableHtml='<table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:#0a5570;"><th style="color:#fff;padding:10px 14px;text-align:center;width:45px;">Sr.</th><th style="color:#fff;padding:10px 14px;text-align:center;">RM Name</th><th style="color:#fff;padding:10px 14px;text-align:center;">Total</th></th></thead><tbody>';
+  rmKeys.forEach(function(rm,i){var cnt=rms[rm];tableHtml+='<tr style="background:'+(i%2===0?'#f4fbfd':'#fff')+';border-bottom:1px solid #e8f4f8;"><td style="text-align:center;padding:11px 14px;color:#6b7280;font-size:12px;">'+(i+1)+'</td><td style="text-align:center;padding:11px 14px;font-weight:700;color:#0a2342;font-size:13px;">'+rm+'</td><td style="text-align:center;padding:11px 14px;font-weight:900;color:#0a7c8c;font-size:16px;">'+cnt+'</td></tr>';});
+  if(rmKeys.length===0)tableHtml+='<tr><td colspan="3" style="text-align:center;padding:20px;color:#9ca3af;font-size:13px;">No data</td></tr>';
+  tableHtml+='<tr style="background:#0a2342;"><td colspan="2" style="padding:12px 14px;font-weight:800;color:#fff;text-align:center;font-size:13px;">Grand Total</td><td style="text-align:center;padding:12px 14px;font-weight:900;color:#ffd700;font-size:17px;">'+total+'</td></tr></tbody></table>';
+  tbl.innerHTML=tableHtml;div.appendChild(tbl);document.body.appendChild(div);
+  html2canvas(div,{scale:2,useCORS:true,backgroundColor:"#ffffff",width:520,height:div.scrollHeight}).then(function(canvas){document.body.removeChild(div);var a=document.createElement("a");a.download=teamName.replace(/\s+/g,"_")+"_Payment_Report.jpg";a.href=canvas.toDataURL("image/jpeg",1.0);a.click();}).catch(function(){if(document.body.contains(div))document.body.removeChild(div);});
+}
+
+function buildAllRMTable(){
+  document.getElementById("pivotBody").innerHTML='<div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>';
+  if(!enrollRawData){document.getElementById("pivotBody").innerHTML='<div style="padding:20px;color:#e05252;">Pehle enrollment data load karo (Refresh dabao)</div>';return;}
+  var cmap={};
+  enrollRawData.rows.forEach(function(r){var rm=(r.rm||"").trim();if(rm&&rm!=="-")cmap[rm.toLowerCase()]=(cmap[rm.toLowerCase()]||0)+1;});
+  google.script.run.withSuccessHandler(function(data){
+    var rows=[],digiList=(data&&data.digiSales)?data.digiSales:[];
+    if(digiList.length>0){var seen={};digiList.forEach(function(m){var name=(m.name||"").trim(),desig=(m.designation||"").trim().toLowerCase();if(!name)return;if(desig.indexOf("chaser")!==-1)return;if(desig.indexOf("application manager")!==-1)return;var key=name.toLowerCase();if(seen[key])return;seen[key]=1;rows.push({name:name,team:m.team||"",count:cmap[key]||0});});}
+    else{var uniqueRMs={};enrollRawData.rows.forEach(function(r){var rm=(r.rm||"").trim();if(rm&&rm!=="-")uniqueRMs[rm]=1;});Object.keys(uniqueRMs).forEach(function(name){rows.push({name:name,team:"",count:cmap[name.toLowerCase()]||0});});}
+    rows.sort(function(a,b){if(a.count===0&&b.count===0)return a.name.localeCompare(b.name);if(a.count===0)return 1;if(b.count===0)return -1;return b.count-a.count;});
+    renderAllRMTable(rows);
+  }).withFailureHandler(function(err){document.getElementById("pivotBody").innerHTML='<div style="padding:20px;color:#e05252;">Error: '+err.message+'</div>';}).getTeamList();
+}
+
+function renderAllRMTable(rows){
+  var gt=rows.reduce(function(s,r){return s+r.count;},0);
+  var html='<div id="pivotTableWrap"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#0a2342;"><th style="color:#fff;padding:10px 14px;text-align:center;width:50px;">Sr.</th><th style="color:#fff;padding:10px 14px;text-align:center;">RM Name</th><th style="color:#fff;padding:10px 14px;text-align:center;">Total</th><th class="no-export" style="color:#fff;padding:10px 14px;text-align:center;width:50px;">Del</th></tr></thead><tbody id="allRMTbody">';
+  rows.forEach(function(r,i){var iz=r.count===0;html+='<tr id="allrm_row_'+i+'" style="background:'+(i%2===0?'#f4fbfd':'#fff')+';border-bottom:1px solid #e8f4f8;"><td style="text-align:center;padding:10px 14px;color:#6b7280;font-size:11px;">'+(i+1)+'</td><td style="padding:10px 14px;font-weight:700;color:'+(iz?'#dc2626':'#0a2342')+';text-align:center;font-size:13px;">'+r.name+'</td><td style="text-align:center;padding:10px 14px;font-weight:900;font-size:17px;color:'+(iz?'#dc2626':'#0a7c8c')+';">'+r.count+'</td><td class="no-export" style="text-align:center;padding:7px 14px;"><button onclick="removeAllRMRow('+i+')" style="background:#fee2e2;border:none;color:#dc2626;width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;">✕</button></td></tr>';});
+  html+='<tr id="allrm_gtrow" style="background:#0a2342;"><td colspan="2" style="padding:12px 14px;font-weight:800;color:#fff;text-align:center;font-size:13px;">Grand Total</td><td style="text-align:center;padding:12px 14px;font-weight:900;color:#ffd700;font-size:18px;" id="allrmGT">'+gt+'</td><td class="no-export"></td></tr></tbody></table></div>';
+  document.getElementById("pivotBody").innerHTML=html;
+}
+function removeAllRMRow(i){var row=document.getElementById("allrm_row_"+i);if(!row)return;var cnt=parseInt(row.cells[2].innerText)||0;row.remove();var gt=document.getElementById("allrmGT");if(gt)gt.innerText=Math.max(0,(parseInt(gt.innerText)||0)-cnt);document.querySelectorAll("#allRMTbody tr[id^='allrm_row_']").forEach(function(r,j){r.cells[0].innerText=(j+1);});}
+
+function buildManagedByTable(){
+  document.getElementById("pivotBody").innerHTML='<div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>';
+  var s=document.getElementById("enStartDate").value,e=document.getElementById("enEndDate").value;
+  google.script.run.withSuccessHandler(function(data){if(data.error){document.getElementById("pivotBody").innerHTML='<div style="padding:20px;color:#e05252;">Error: '+data.error+'</div>';return;}renderOnFieldTable(data.rows);}).getOnFieldRMDepositCount(s,e);
+}
+function renderOnFieldTable(rows){
+  var gt=rows.reduce(function(s,r){return s+r.count;},0);
+  var html='<div id="pivotTableWrap"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#065f46;"><th style="color:#fff;padding:10px 14px;text-align:center;width:50px;">Sr.</th><th style="color:#fff;padding:10px 14px;text-align:center;">On-Field RM</th><th style="color:#fff;padding:10px 14px;text-align:center;">Total</th><th class="no-export" style="color:#fff;padding:10px 14px;text-align:center;width:50px;">Del</th></tr></thead><tbody id="ofRMTbody">';
+  rows.forEach(function(r,i){var iz=r.count===0;html+='<tr id="ofrm_row_'+i+'" style="background:'+(i%2===0?'#f0fdf4':'#fff')+';border-bottom:1px solid #d1fae5;"><td style="text-align:center;padding:10px 14px;color:#6b7280;font-size:11px;">'+(i+1)+'</td><td style="padding:10px 14px;font-weight:700;color:'+(iz?'#dc2626':'#065f46')+';text-align:center;font-size:13px;">'+r.name+'</td><td style="text-align:center;padding:10px 14px;font-weight:900;font-size:17px;color:'+(iz?'#dc2626':'#059669')+';">'+r.count+'</td><td class="no-export" style="text-align:center;padding:7px 14px;"><button onclick="removeOnFieldRow('+i+')" style="background:#fee2e2;border:none;color:#dc2626;width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;">✕</button></td></tr>';});
+  html+='<tr style="background:#065f46;"><td colspan="2" style="padding:12px 14px;font-weight:800;color:#fff;text-align:center;font-size:13px;">Grand Total</td><td style="text-align:center;padding:12px 14px;font-weight:900;color:#ffd700;font-size:18px;" id="ofrmGT">'+gt+'</td><td class="no-export"></td></tr></tbody></table></div>';
+  document.getElementById("pivotBody").innerHTML=html;
+}
+function removeOnFieldRow(i){var row=document.getElementById("ofrm_row_"+i);if(!row)return;var cnt=parseInt(row.cells[2].innerText)||0;row.remove();var gt=document.getElementById("ofrmGT");if(gt)gt.innerText=Math.max(0,(parseInt(gt.innerText)||0)-cnt);document.querySelectorAll("#ofRMTbody tr[id^='ofrm_row_']").forEach(function(r,j){r.cells[0].innerText=(j+1);});}
+
+function exportPivotJPG(){
+  var wrap=document.getElementById("pivotTableWrap");if(!wrap){alert("Pehle ek tab select karo!");return;}
+  var title=document.getElementById("pivotModalTitle").innerText||"Report";
+  var dateL=getPivotDateLabel();
+  var noExport=wrap.querySelectorAll(".no-export");noExport.forEach(function(el){el.style.display="none";});
+  var exportDiv=document.createElement("div");exportDiv.style.cssText="background:#fff;padding:0;font-family:Inter,sans-serif;display:inline-block;width:100%;";
+  var hdr=document.createElement("div");hdr.style.cssText="padding:16px 16px 10px;";hdr.innerHTML='<div style="font-size:16px;font-weight:800;color:#0a2342;margin-bottom:4px;text-align:center;">'+title+'</div><div style="font-size:12px;color:#6b7280;text-align:center;">📅 '+dateL+'</div>';exportDiv.appendChild(hdr);
+  var tableClone=wrap.cloneNode(true);tableClone.querySelectorAll(".no-export").forEach(function(el){el.remove();});exportDiv.appendChild(tableClone);
+  exportDiv.style.position="fixed";exportDiv.style.left="-9999px";exportDiv.style.top="0";exportDiv.style.width="600px";document.body.appendChild(exportDiv);
+  html2canvas(exportDiv,{scale:2,useCORS:true,backgroundColor:"#ffffff",width:600,height:exportDiv.scrollHeight}).then(function(canvas){noExport.forEach(function(el){el.style.display="";});document.body.removeChild(exportDiv);var a=document.createElement("a");a.download=title.replace(/\s+/g,"_")+".jpg";a.href=canvas.toDataURL("image/jpeg",1.0);a.click();}).catch(function(){noExport.forEach(function(el){el.style.display="";});if(document.body.contains(exportDiv))document.body.removeChild(exportDiv);});
+}
+</script>

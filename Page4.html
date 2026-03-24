@@ -1,0 +1,100 @@
+<!-- ══════════════════════════════════════
+     PAGE 4 — On-Field KPI
+     Edit only this file for Page 4 changes
+══════════════════════════════════════ -->
+
+<div class="page" id="page-4">
+
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="control-group"><label>From</label><input type="date" id="ofStartDate"></div>
+    <div class="control-group"><label>To</label><input type="date" id="ofEndDate"></div>
+    <button class="btn-apply" onclick="loadOnFieldData()">Apply</button>
+    <div class="controls-divider"></div>
+    <button class="btn-refresh" id="refreshBtn4" onclick="loadOnFieldData()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
+    </button>
+    <div class="controls-divider"></div>
+    <div class="zoom-group">
+      <label>Zoom</label>
+      <input type="range" min="50" max="150" value="100" id="zoomRange4" oninput="zoomTable4()">
+      <span class="zoom-badge" id="zoomValue4">100%</span>
+    </div>
+  </div>
+
+  <!-- Download FAB -->
+  <button class="dl-toggle-btn" id="dlToggleBtn4" onclick="toggleExportPanel4()" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span class="dl-label">Download</span>
+  </button>
+  <div class="export-panel" id="exportPanel4">
+    <div class="export-panel-header"><span class="export-panel-title">Download</span><button class="export-panel-close" onclick="toggleExportPanel4()">✕</button></div>
+    <div class="export-btns">
+      <button class="btn-exp btn-jpg" onclick="downloadJPG4()">Export JPG</button>
+      <button class="btn-exp btn-xlsx" onclick="downloadExcel4()">Export Excel</button>
+      <button class="btn-exp btn-pdf" onclick="downloadPDF4()">Export PDF</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div id="zoomWrapper4">
+    <div class="page-header" style="background:linear-gradient(120deg,#0f0c29,#302b63,#24243e);">
+      <div class="header-title"><p>On-Field Team KPI &nbsp;|&nbsp; <span id="ofDateLabel">Loading...</span></p></div>
+    </div>
+    <div class="table-card">
+      <div id="onFieldContainer">
+        <div class="loading-state">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Loading...
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════
+   PAGE 4 — On-Field KPI Logic
+════════════════════════════════ */
+
+function loadOnFieldData(){
+  var btn=document.getElementById("refreshBtn4");if(btn)btn.classList.add("spinning");
+  var s=document.getElementById("ofStartDate").value,e=document.getElementById("ofEndDate").value;
+  document.getElementById("ofDateLabel").innerText=fmtDateLabel(s,e);
+  document.getElementById("onFieldContainer").innerHTML='<div class="loading-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Loading...</div>';
+  google.script.run.withSuccessHandler(function(data){
+    if(btn)btn.classList.remove("spinning");
+    onFieldRawData=data;
+    document.getElementById("dlToggleBtn4").style.display="flex";
+    var html="<table><colgroup><col style='width:22px'><col style='width:120px'><col style='width:40px'><col style='width:40px'><col style='width:40px'><col style='width:40px'><col style='width:48px'><col style='width:46px'></colgroup>";
+    html+="<thead><tr><th rowspan='2'>#</th><th rowspan='2'>RM Name</th><th rowspan='2'>Deposit</th><th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.2)'>Apps</th><th colspan='2' style='border-bottom:1px solid rgba(255,255,255,0.2)'>Onboarding</th><th rowspan='2'>Status</th></tr><tr><th>Old</th><th>New</th><th>W/MOU</th><th>W/O</th></tr></thead><tbody>";
+    data.teams.forEach(function(team){
+      html+="<tr class='row-team' onclick='showTeamCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(team))+"\"))'><td colspan='8'>"+team.teamName+"</td></tr>";
+      team.members.forEach(function(m){
+        html+="<tr class='data-row' onclick='showRMCard(decodeURIComponent(\""+encodeURIComponent(JSON.stringify(m))+"\"))'>";
+        html+="<td>"+m.sr+"</td><td style='text-align:left;padding-left:6px;'>"+m.name+"</td>";
+        html+="<td>"+fmtNum(m.deposit)+"</td><td>"+fmtNum(m.oldApp)+"</td><td>"+fmtNum(m.newApp)+"</td>";
+        html+="<td>"+fmtNum(m.withMOU)+"</td><td>"+fmtNum(m.withoutMOU)+"</td>";
+        html+="<td>"+statusBadge(m.status)+"</td></tr>";
+      });
+      html+="<tr class='row-total'><td></td><td style='text-align:left;padding-left:8px'>Team Total</td><td>"+team.totals.deposit+"</td><td>"+team.totals.oldApp+"</td><td>"+team.totals.newApp+"</td><td>"+team.totals.withMOU+"</td><td>"+team.totals.withoutMOU+"</td><td></td></tr>";
+    });
+    var g=data.grandTotal;
+    html+="<tr class='row-grand'><td></td><td style='text-align:left;padding-left:8px'>Grand Total</td><td>"+g.deposit+"</td><td>"+g.oldApp+"</td><td>"+g.newApp+"</td><td>"+g.withMOU+"</td><td>"+g.withoutMOU+"</td><td></td></tr></tbody></table>";
+    document.getElementById("onFieldContainer").innerHTML=html;
+  }).getOnFieldData(s,e);
+}
+
+/* Exports */
+function downloadJPG4(){html2canvas(document.getElementById("zoomWrapper4"),{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(function(c){var a=document.createElement("a");a.download="KPI_OnField.jpg";a.href=c.toDataURL("image/jpeg",1.0);a.click();});}
+function downloadExcel4(){
+  if(!onFieldRawData)return;
+  var ws=[["#","RM","Deposit","Old App","New App","With MOU","W/O MOU","Status"]];
+  onFieldRawData.teams.forEach(function(t){ws.push(["",t.teamName,"","","","","",""]);t.members.forEach(function(m){ws.push([m.sr,m.name,m.deposit,m.oldApp,m.newApp,m.withMOU,m.withoutMOU,m.status]);});ws.push(["","Total",t.totals.deposit,t.totals.oldApp,t.totals.newApp,t.totals.withMOU,t.totals.withoutMOU,""]);});
+  var g=onFieldRawData.grandTotal;ws.push(["","Grand Total",g.deposit,g.oldApp,g.newApp,g.withMOU,g.withoutMOU,""]);
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws),"On-Field KPI");XLSX.writeFile(wb,"KPI_OnField.xlsx");
+}
+function downloadPDF4(){html2canvas(document.getElementById("zoomWrapper4"),{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(function(c){var w=window.open('','_blank');w.document.write('<html><body style="margin:0"><img src="'+c.toDataURL("image/jpeg",1.0)+'" style="width:100%"></body></html>');w.document.close();setTimeout(function(){w.print();w.close();},500);});}
+</script>
